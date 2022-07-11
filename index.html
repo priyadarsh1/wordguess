@@ -1,0 +1,142 @@
+<html>
+
+<head>
+    <title>Word Guess</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <div class="row">
+        <div class="col-xs-6 jumbotron" style="height: 768px;padding: 5%;">
+            <h1>Word Guess!</h1>
+            <form id="detailForm">
+                Name: <input type="text" name="name" id="detailformname">
+                Email: <input type="email" name="email" id="detailformmail">
+            </form>
+            <button onclick="takeUserDetails()" value="Save" id="detailbutton">Save Detail</button>
+
+            <h3>Guess the word: <input type="text" name="guessword" id="guessword"></h3>
+            <div style="display: flex;">
+                <button type="button" id="submitbutton">Submit</button>
+                &nbsp;&nbsp;
+                <button type="button" id="resetbutton" onclick="resetGame()">Reset</button>
+            </div>
+
+            <h4 id="scoreSection"></h4>
+            <h4 id="colortext"></h4>
+            <h4 id="resultSection"></h4>
+
+        </div>
+        <div class="col-xs-6" id="wordList" style="overflow-y: auto; height: 768px;"></div>
+    </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            document.getElementById('submitbutton').disabled = true;
+            document.getElementById('detailbutton').disabled = false;
+        });
+
+        let name, email;
+        let words = ["paper", "plane", "weird", "tired", "vague", "pills", "wired", "bread", "broom", "bride", "beads",
+            "catch", "cough", "dread", "fight", "fruit", "guava", "great", "graft", "honor", "ideas", "indic", "lamps", "pests",
+            "queen", "quick", "quilt", "roast", "roots", "stink", "super", "tamed", "tried", "volvo", "wreak", "yield"];
+        let randomWord;
+        let attempt = 0;
+
+        document.getElementById('submitbutton').addEventListener('click', wordGuessingGame);
+
+        var x = document.createElement("table");
+        x.setAttribute("id", "wordlisttable");
+        x.setAttribute("border", "1");
+        document.getElementById('wordList').appendChild(x);
+        var index, len;
+        for (index = 0, len = words.length; index < len; ++index) {
+            var y = document.createElement("tr");
+            y.setAttribute("id", "myTr");
+            document.getElementById("wordlisttable").appendChild(y);
+
+            var t = document.createElement("td");
+            t.appendChild(document.createTextNode(words[index]));
+            y.appendChild(t);
+        }
+
+
+        function wordGuessingGame() {
+            let matrix;
+            matrix = document.getElementById('guessword').value;
+            let res = checkWord(matrix);
+            attempt = attempt + 1;
+            document.getElementById('scoreSection').innerHTML = `Score: ${res}`;
+
+            if (res == 10) {
+                document.getElementById('resultSection').innerHTML = `Congratulations ${name}! You guessed it right. The correct word is ${randomWord}`;
+                document.getElementById("submitbutton").disabled = true;
+                setTimeout(resetGame, 3000);
+                return;
+            }
+            else {
+                if (attempt == 6) {
+                    document.getElementById('resultSection').innerHTML = `Sorry ${name}! Your attempts are over. The correct word was ${randomWord}`;
+                    document.getElementById("submitbutton").disabled = true;
+                    setTimeout(resetGame, 3000);
+                    return;
+                }
+                else {
+                    document.getElementById('resultSection').innerHTML = `Hey ${name}. You still have ${6 - attempt} attempts. Please try again!`;
+                    guessword.value = '';
+                }
+            }
+        }
+
+        function takeUserDetails() {
+            document.getElementById("submitbutton").disabled = true;
+            name = document.getElementById('detailformname').value;
+            email = document.getElementById('detailformmail').value;
+            randomWord = words[Math.floor(Math.random() * words.length)];
+            document.getElementById("detailbutton").disabled = true;
+            document.getElementById("submitbutton").disabled = false;
+        }
+
+        function checkWord(arr) {
+            let sum = 0;
+            let styledText = '';
+            for (let i = 0; i < arr.length; i++) {
+                if (arr[i] == randomWord[i]) {
+                    styledText += '<span style="color:green">' + arr[i] + '</span>';
+                    sum = sum + 2;
+                }
+                else {
+                    if (randomWord.indexOf(arr[i].toLowerCase()) == -1) {
+                        styledText += '<span style="color:red">' + arr[i] + '</span>';
+                        sum = sum + 0;
+                    }
+                    else {
+                        styledText += '<span style="color:gold">' + arr[i] + '</span>';
+                        sum = sum + 1;
+                    }
+                }
+            }
+            document.getElementById('colortext').innerHTML = `You guessed ${styledText}`
+            return sum;
+        }
+
+        function resetGame() {
+            document.getElementById('guessword').value = '';
+            document.getElementById('detailformname').value = '';
+            document.getElementById('detailformmail').value = '';
+            document.getElementById('resultSection').innerHTML = '';
+            document.getElementById('scoreSection').innerHTML = '';
+            document.getElementById("detailbutton").disabled = false;
+            document.getElementById("submitbutton").disabled = true;
+            document.getElementById("colortext").innerHTML = '';
+            randomWord = '';
+            attempt = 0;
+        }
+    </script>
+</body>
+
+</html>
